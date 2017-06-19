@@ -1,26 +1,52 @@
 #include "DiscoVirtual.h"
 
-DiscoVirtual::DiscoVirtual(char * nombre, int tamDV)
+DiscoVirtual::DiscoVirtual(char * nombre, int tamDV, bool nuevo)
 {
     nombreDV = nombre;
-    archivo = new Archivo(nombreDV, false);
+    archivo = new Archivo(nombreDV, nuevo);
     archivo->abrir();
     this->tamanoDiscoVirtual = tamDV;
     this->masterBlock = new MasterBlock(this->archivo, tamDV);
-    masterBlock->cargar();
+    int numBloques = masterBlock->getCantBloques()-2;
+    cantBloquesIdx = ((numBloques*(TAMNOMBRE+8))/masterBlock->getTamBloque())+1;
+    cantIndXBloque = masterBlock->getTamBloque()/(TAMNOMBRE+8);
+
+    if(nuevo){
+        masterBlock->setSigBloque(cantBloquesIdx+2);
+        masterBlock->guardar();
+    }
+    else
+        masterBlock->cargar();
 }
 
 DiscoVirtual * DiscoVirtual::crearDiscoVirtual(char* nombreArchivo)
 {
-    DiscoVirtual * disc = new DiscoVirtual(nombreArchivo,this->getTamanoDiscoVirtual());
+    DiscoVirtual * disc = new DiscoVirtual(nombreArchivo,this->getTamanoDiscoVirtual(), true);
     disc->formatear();
     return disc;
 }
 
-void DiscoVirtual::asignarSigBloque(char * nombre, char * cont, int actual, bool esFolder)
+void DiscoVirtual::formatear()
+{
+    archivo = new Archivo(nombreDV, true);
+    archivo->setTamano(tamanoDiscoVirtual);
+    MasterBlock * mb = new MasterBlock(this->archivo, tamanoDiscoVirtual);
+    int numBloques = mb->getCantBloques()-2;
+    cantBloquesIdx = ((numBloques*(TAMNOMBRE+8))/mb->getTamBloque())+1;
+    cantIndXBloque = masterBlock->getTamBloque()/(TAMNOMBRE+8);
+    mb->setSigBloque(cantBloquesIdx+2);
+
+    setMasterBlock(mb);
+    masterBlock->guardar();
+
+    BloqueFolder * raiz = new BloqueFolder("Raiz", 1, mb->getTamBloque(), archivo);
+    raiz->guardar();
+}
+
+int DiscoVirtual::asignarSigBloque(char * nombre, char * cont, int actual, bool esFolder)
 {
     int pb = masterBlock->getSigBloque();
-    int tam = 24 + strlen(nombre) +strlen(cont);
+    int tam = 20 + strlen(nombre) +strlen(cont);
     int ub = pb + (tam/masterBlock->getTamBloque());
 
     char * data = archivo->leer((actual * masterBlock->getTamBloque()), masterBlock->getTamBloque());
@@ -29,6 +55,11 @@ void DiscoVirtual::asignarSigBloque(char * nombre, char * cont, int actual, bool
     foldActual->initFromChar(data);
 
     FileEntry * fe = new FileEntry("", 0, 0, false);
+
+    int numEntry = foldActual->getArchivoEntries().size();
+    idxHashEntry * idxHE = asignHashEntry(nombre, actual, numEntry);
+    if(idxHE == NULL)
+        return -1;
 
     if(esFolder){
         bf = new BloqueFolder(nombre, pb, masterBlock->getTamBloque(), archivo);
@@ -63,6 +94,9 @@ void DiscoVirtual::asignarSigBloque(char * nombre, char * cont, int actual, bool
         sigBF->guardar();
         masterBlock->setSigBloque(masterBlock->getSigBloque()+1);
     }
+
+    masterBlock->guardar();
+    return 0;
 }
 
 int DiscoVirtual::getCantEntries(int actual){
@@ -107,26 +141,101 @@ list<FileEntry *> DiscoVirtual::listarArchivos(int actual)
     return entries;
 }
 
-void DiscoVirtual::cargar()
+int DiscoVirtual::cargarFolder(char * key)
 {
-    this->archivo->abrir();
-    this->masterBlock = new MasterBlock(this->archivo, tamanoDiscoVirtual);
-    this->masterBlock->cargar();
+    cout << key << endl;
+    if(strcmp("Raiz", key) == 0)
+        return 1;
+
+    int pos = hash(key);
+    cout << pos << endl;
+    int numBloqueHash = (pos/masterBlock->getTamBloque())+2;
+    int numEntryHash = pos%cantIndXBloque;
+    int posArchivo = (numBloqueHash*masterBlock->getTamBloque())+(numEntryHash*(TAMNOMBRE+8));
+    char * data = archivo->leer(posArchivo, (TAMNOMBRE+8));
+
+    idxHashEntry * idxHE = new idxHashEntry(masterBlock->getTamBloque(), archivo);
+    idxHE->initFromChar(data);
+
+    cout << idxHE->getNombre() << endl;
+
+    if(strcmp(idxHE->getNombre(), key) == 0){
+        list<FileEntry*> lista = listarArchivos(idxHE->getNumeroBloque());
+        list<FileEntry*>::iterator it = lista.begin();
+        advance(it, idxHE->getNumeroEntry());
+        FileEntry * fe = *it;
+        return fe->getPrimerBloque();
+    }
+
+    return -1;
 }
 
-void DiscoVirtual::formatear()
-{
-    archivo = new Archivo(nombreDV, true);
-    archivo->setTamano(tamanoDiscoVirtual);
-    MasterBlock * mb = new MasterBlock(this->archivo, tamanoDiscoVirtual);
-    mb->setSigBloque(2);
-    mb->guardar();
+void DiscoVirtual::cargarArchivo(char * key){
+    if(key == "Raiz")
+        return;
 
-    setMasterBlock(mb);
-    archivo->setTamano(tamanoDiscoVirtual);
+    int pos = hash(key);
+    cout << pos << endl;
+    int numBloqueHash = (pos/masterBlock->getTamBloque())+2;
+    int numEntryHash = pos%cantIndXBloque;
+    int posArchivo = (numBloqueHash*masterBlock->getTamBloque())+(numEntryHash*(TAMNOMBRE+8));
+    char * data = archivo->leer(posArchivo, (TAMNOMBRE+8));
 
-    BloqueFolder * raiz = new BloqueFolder("Raiz", 1, mb->getTamBloque(), archivo);
-    raiz->guardar();
+    idxHashEntry * idxHE = new idxHashEntry(masterBlock->getTamBloque(), archivo);
+    idxHE->initFromChar(data);
+
+    if(strcmp(idxHE->getNombre(), key) == 0){
+        cout << "ENTRA A IDXHE" << endl;
+        cout << "Numero de bloque " << idxHE->getNumeroBloque() << endl;
+        list<FileEntry*> lista = listarArchivos(idxHE->getNumeroBloque());
+        list<FileEntry*>::iterator it = lista.begin();
+        advance(it, idxHE->getNumeroEntry());
+        FileEntry * fe = *it;
+
+        if(!fe->esFold()){
+            BloqueArchivo * ba = new BloqueArchivo("", "", -1, -1, masterBlock->getTamBloque(), archivo);
+            data = archivo->leer(fe->getPrimerBloque()*masterBlock->getTamBloque(),
+                                 ((fe->getUltimoBloque()-fe->getPrimerBloque())+1)*masterBlock->getTamBloque());
+            ba->initFromChar(data);
+
+            Input * inp = new Input(NULL, ba, true);
+            inp->exec();
+            delete inp;
+        }
+    }
+}
+
+int DiscoVirtual::hash(char * key){
+    int sum = 0;
+
+    for (int k = 0; k < strlen(key); k++)
+        sum = sum + int(key[k]);
+
+    return  sum;
+}
+
+idxHashEntry * DiscoVirtual::asignHashEntry(char * key, int numBloque, int numEntry){
+    char * newKey = new char[TAMNOMBRE];
+    memcpy(newKey, key, TAMNOMBRE);
+    newKey[TAMNOMBRE-1] = '\0';
+    int pos = hash(newKey);
+    cout << pos << " Para key " << newKey << endl;
+    int numBloqueHash = (pos/masterBlock->getTamBloque())+2;
+    int numEntryHash = pos%cantIndXBloque;
+    int posArchivo = (numBloqueHash*masterBlock->getTamBloque())+(numEntryHash*(TAMNOMBRE+8));
+    char * data = archivo->leer(posArchivo, (TAMNOMBRE+8));
+
+    idxHashEntry * idxHE = new idxHashEntry(masterBlock->getTamBloque(), archivo);
+    idxHE->initFromChar(data);
+
+    if(strcmp(key, idxHE->getNombre()) == 0){
+        return NULL;
+    }
+    else{
+        idxHE = new idxHashEntry(key, numBloque, numEntry, masterBlock->getTamBloque(), archivo);
+        idxHE->guardar(numBloqueHash, numEntryHash);
+        return idxHE;
+    }
 }
 
 Archivo * DiscoVirtual::getArchivo()

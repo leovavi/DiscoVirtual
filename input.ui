@@ -38,15 +38,46 @@
      <height>261</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
   </widget>
   <widget class="QLineEdit" name="nombre">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>30</y>
+     <y>40</y>
      <width>491</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>10</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Nombre</string>
    </property>
   </widget>
  </widget>

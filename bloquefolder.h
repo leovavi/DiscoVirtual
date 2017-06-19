@@ -1,5 +1,6 @@
 #ifndef BLOQUEFOLDER_H
 #define BLOQUEFOLDER_H
+#define TAMNOMBRE 25
 #include <list>
 #include <string.h>
 #include "fileentry.h"

@@ -20,7 +20,7 @@ void MasterBlock::initFromChar(char * data){
 }
 
 char* MasterBlock::masterBlockToChar(){
-    char * data = new char[tamBloque];
+    char * data = new char[16];
     int pos = 0;
 
     memcpy(&(data[pos]), &tamBloque, 4);
@@ -36,7 +36,7 @@ char* MasterBlock::masterBlockToChar(){
 
 void MasterBlock::guardar(){
     char * data = masterBlockToChar();
-    archivo->escribir(0, data, tamBloque);
+    archivo->escribir(0, data, 16);
 }
 
 void MasterBlock::cargar()

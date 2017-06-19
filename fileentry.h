@@ -1,5 +1,6 @@
 #ifndef FILEENTRY_H
 #define FILEENTRY_H
+#define TAMNOMBRE 25
 #include <string.h>
 
 class FileEntry

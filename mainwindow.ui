@@ -49,7 +49,7 @@
      <rect>
       <x>140</x>
       <y>10</y>
-      <width>701</width>
+      <width>621</width>
       <height>41</height>
      </rect>
     </property>
@@ -104,15 +104,54 @@
      <string>New Archivo</string>
     </property>
    </widget>
-   <widget class="QTreeView" name="treeView">
+   <widget class="QPushButton" name="btnBack">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>20</y>
+      <width>31</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../../../../Recursos/File Explorer/back.png</normaloff>../../../../../Recursos/File Explorer/back.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnFront">
+    <property name="geometry">
+     <rect>
+      <x>805</x>
+      <y>20</y>
+      <width>31</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../../../../Recursos/File Explorer/front.png</normaloff>../../../../../Recursos/File Explorer/front.png</iconset>
+    </property>
+   </widget>
+   <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>71</y>
       <width>121</width>
       <height>441</height>
      </rect>
     </property>
+    <column>
+     <property name="text">
+      <string notr="true">1</string>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -124,6 +163,18 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuArchivo">
+    <property name="title">
+     <string>Archivo</string>
+    </property>
+    <addaction name="actionNuevo_Folder"/>
+    <addaction name="actionNuevo_Archivo"/>
+    <addaction name="separator"/>
+    <addaction name="actionFormatear_Disco"/>
+    <addaction name="separator"/>
+    <addaction name="actionSalir"/>
+   </widget>
+   <addaction name="menuArchivo"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -134,6 +185,38 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNuevo_Folder">
+   <property name="text">
+    <string>Nuevo Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionNuevo_Archivo">
+   <property name="text">
+    <string>Nuevo Archivo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionFormatear_Disco">
+   <property name="text">
+    <string>Formatear Disco</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionSalir">
+   <property name="text">
+    <string>Salir</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

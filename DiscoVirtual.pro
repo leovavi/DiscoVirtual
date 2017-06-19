@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     fileentry.cpp \
     files.cpp \
     input.cpp \
-    masterblock.cpp
+    masterblock.cpp \
+    idxhashentry.cpp
 
 HEADERS  += mainwindow.h \
     archivo.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     fileentry.h \
     files.h \
     input.h \
-    masterblock.h
+    masterblock.h \
+    idxhashentry.h
 
 FORMS    += mainwindow.ui \
     input.ui

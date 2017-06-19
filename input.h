@@ -13,7 +13,7 @@ class Input : public QDialog
     Q_OBJECT
 
 public:
-    explicit Input(QWidget *parent = 0, BloqueArchivo * ba = 0);
+    explicit Input(QWidget *parent = 0, BloqueArchivo * ba = 0, bool leer = false);
     ~Input();
 
 private slots:
@@ -22,6 +22,7 @@ private slots:
 private:
     Ui::Input *ui;
     BloqueArchivo * ba;
+    bool leer;
 };
 
 #endif // INPUT_H

@@ -1,9 +1,12 @@
 #include "files.h"
 
-Files::Files(FileEntry * fe, int posX, int posY, bool selected){
-    this->fe = fe;
+Files::Files(char *nombre, bool esFold, int posX, int posY, bool selected){
+    this->nombre = new char[TAMNOMBRE];
+    memcpy(this->nombre, nombre, TAMNOMBRE);
+    this->nombre[TAMNOMBRE-1] = '\0';
+    this->esFold = esFold;
     QString path = "C:\\Users\\Leovavi\\Documents\\UNITEC\\Recursos\\File Explorer\\";
-    path += (fe->esFold() ? "folder.png" : "texto.png");
+    path += (esFold ? "folder.png" : "texto.png");
 
     image = new QImage(path);
     this->posX = posX;
@@ -28,5 +31,5 @@ void Files::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     }
 
     painter->drawImage(rect, *image, QRectF(0,0,100,130));
-    painter->drawText(QRectF(posX, posY+40, 100, 130), Qt::AlignCenter | Qt::TextWordWrap | Qt::TextDontClip, fe->getNombre());
+    painter->drawText(QRectF(posX, posY+40, 100, 130), Qt::AlignCenter | Qt::TextWordWrap | Qt::TextDontClip, nombre);
 }

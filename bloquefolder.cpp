@@ -2,9 +2,12 @@
 
 BloqueFolder::BloqueFolder(char* nom, int numBlo, int capacidadBloque, Archivo* ar)
 {
-    this->nombre = nom;
+    this->nombre = new char[TAMNOMBRE];
+    memcpy(this->nombre, nom, TAMNOMBRE);
+    nombre[TAMNOMBRE-1] = '\0';
+
     this->numeroBloque = numBlo;
-    this->tamBloque = strlen(nombre)+16;
+    this->tamBloque = TAMNOMBRE+12;
     this->capacidadBloque = capacidadBloque;
     this->sigBloque = -1;
     this->archivo = ar;
@@ -59,14 +62,11 @@ void BloqueFolder::guardar(){
 char * BloqueFolder::bloqueFolderToChar(){
     char * data = new char[tamBloque+4];
     int pos = 0;
-    int tamNombre = strlen(nombre);
 
     memcpy(&(data[pos]), &tamBloque, 4);
     pos += 4;
-    memcpy(&(data[pos]), &tamNombre, 4);
-    pos += 4;
-    memcpy(&(data[pos]), nombre, tamNombre);
-    pos += tamNombre;
+    memcpy(&(data[pos]), nombre, TAMNOMBRE);
+    pos += TAMNOMBRE;
     memcpy(&(data[pos]), &numeroBloque, 4);
     pos += 4;
     memcpy(&(data[pos]), &capacidadBloque, 4);
@@ -76,16 +76,13 @@ char * BloqueFolder::bloqueFolderToChar(){
 
     for(list<FileEntry*>::iterator it = archivoEntries.begin(); it!=archivoEntries.end(); it++){
         FileEntry * fe = *it;
-        tamNombre = strlen(fe->getNombre());
         int pb = fe->getPrimerBloque();
         int ub = fe->getUltimoBloque();
         int tamBloque = fe->getTamArchivo();
         bool esFolder = fe->esFold();
 
-        memcpy(&(data[pos]), &tamNombre, 4);
-        pos += 4;
-        memcpy(&(data[pos]), fe->getNombre(), tamNombre);
-        pos += tamNombre;
+        memcpy(&(data[pos]), fe->getNombre(), TAMNOMBRE);
+        pos += TAMNOMBRE;
         memcpy(&(data[pos]), &pb, 4);
         pos += 4;
         memcpy(&(data[pos]), &ub, 4);
@@ -100,15 +97,13 @@ char * BloqueFolder::bloqueFolderToChar(){
 }
 
 void BloqueFolder::initFromChar(char * data){
-    int pos = 0, tamNombre = 0;
+    int pos = 0;
     archivoEntries.clear();
     memcpy(&tamBloque, &(data[pos]), 4);
     pos += 4;
-    memcpy(&tamNombre, &(data[pos]), 4);
-    pos += 4;
-    nombre = new char[tamNombre];
-    memcpy(nombre, &(data[pos]), tamNombre);
-    pos += tamNombre;
+    nombre = new char[TAMNOMBRE];
+    memcpy(nombre, &(data[pos]), TAMNOMBRE);
+    pos += TAMNOMBRE;
     memcpy(&numeroBloque, &(data[pos]), 4);
     pos += 4;
     memcpy(&capacidadBloque, &(data[pos]), 4);
@@ -117,14 +112,12 @@ void BloqueFolder::initFromChar(char * data){
     pos += 4;
 
     for(int i = pos; i<tamBloque; ){
-        int pb = 0, ub = 0, tam = 0, tamNombre = 0;
+        int pb = 0, ub = 0, tam = 0;
         bool esFolder = false;
 
-        memcpy(&tamNombre, &(data[i]), 4);
-        i += 4;
-        char * nom = new char[tamNombre];
-        memcpy(nom, &(data[i]), tamNombre);
-        i += tamNombre;
+        char * nom = new char[TAMNOMBRE];
+        memcpy(nom, &(data[i]), TAMNOMBRE);
+        i += TAMNOMBRE;
         memcpy(&pb, &(data[i]), 4);
         i += 4;
         memcpy(&ub, &(data[i]), 4);

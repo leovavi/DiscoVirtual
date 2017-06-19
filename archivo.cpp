@@ -31,6 +31,8 @@ void Archivo::escribir(int pos, char * data, int longitud){
 
 void Archivo::setTamano(int pos){
     abrir();
+    if(file == NULL)
+        file = fopen(nombre, "w");
     fseek(file, pos, SEEK_SET);
     fputc('\0', file);
     cerrar();

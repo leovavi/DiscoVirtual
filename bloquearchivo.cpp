@@ -1,11 +1,14 @@
 #include "BloqueArchivo.h"
 
 BloqueArchivo::BloqueArchivo(char * nom, char * cont, int pb, int ub, int cap, Archivo * ar){
-    nombre = nom;
-    contenido = cont;
+    nombre = new char[TAMNOMBRE];
+    memcpy(nombre, nom, TAMNOMBRE);
+    nombre[TAMNOMBRE-1] = '\0';
+    contenido = new char[strlen(cont)];
+    memcpy(contenido, cont, strlen(cont));
     primerBloque = pb;
     ultimoBloque = ub;
-    tamanoBloque = 24 + strlen(nombre) + strlen(contenido);
+    tamanoBloque = 20 + TAMNOMBRE + strlen(contenido);
     capacidadBloque = cap;
     this->ar = ar;
 }
@@ -35,25 +38,27 @@ int BloqueArchivo::getCapacidadBloque(){
 }
 
 void BloqueArchivo::setNombre(char * nombre){
-    this->nombre = nombre;
+    this->nombre = new char[TAMNOMBRE];
+    memcpy(this->nombre, nombre, TAMNOMBRE);
+    this->nombre[TAMNOMBRE-1] = '\0';
 }
 
 void BloqueArchivo::setContenido(char * contenido){
-    this->contenido = contenido;
+    this->contenido = new char[strlen(contenido)+1];
+    memcpy(this->contenido, contenido, strlen(contenido));
+    this->contenido[strlen(contenido)] = '\0';
 }
 
 char * BloqueArchivo::bloqueArchivoToChar(){
-    int tam = 24, pos = 0;
-    tam += (strlen(nombre) + strlen(contenido));
+    int tam = 20, pos = 0;
+    tam += (TAMNOMBRE + strlen(contenido));
 
     char * data = new char[tam];
 
-    int tamNombre = strlen(nombre), tamContenido = strlen(contenido);
+    int tamContenido = strlen(contenido);
 
-    memcpy(&(data[pos]), &tamNombre, 4);
-    pos += 4;
-    memcpy(&(data[pos]), nombre, tamNombre);
-    pos += tamNombre;
+    memcpy(&(data[pos]), nombre, TAMNOMBRE);
+    pos += TAMNOMBRE;
     memcpy(&(data[pos]), &primerBloque, 4);
     pos += 4;
     memcpy(&(data[pos]), &ultimoBloque, 4);
@@ -75,13 +80,11 @@ void BloqueArchivo::guardar(){
 }
 
 void BloqueArchivo::initFromChar(char * data){
-    int pos = 0, tamNombre = 0, tamContenido = 0;
+    int pos = 0, tamContenido = 0;
 
-    memcpy(&tamNombre, &(data[pos]), 4);
-    pos += 4;
-    nombre = new char[tamNombre];
-    memcpy(nombre, &(data[pos]), tamNombre);
-    pos += tamNombre;
+    nombre = new char[TAMNOMBRE];
+    memcpy(nombre, &(data[pos]), TAMNOMBRE);
+    pos += TAMNOMBRE;
     memcpy(&primerBloque, &(data[pos]), 4);
     pos += 4;
     memcpy(&ultimoBloque, &(data[pos]), 4);

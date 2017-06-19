@@ -1,10 +1,12 @@
 #include "fileentry.h"
 
 FileEntry::FileEntry(char * nombre, int pb, int ub, bool esFolder){
-    this->nombre = nombre;
+    this->nombre = new char[TAMNOMBRE];
+    memcpy(this->nombre, nombre, TAMNOMBRE);
+    this->nombre[TAMNOMBRE-1] = '\0';
     primerBloque = pb;
     ultimoBloque = ub;
-    tamArchivo = strlen(nombre)+17;
+    tamArchivo = TAMNOMBRE+13;
     this->esFolder = esFolder;
 }
 
@@ -29,5 +31,7 @@ bool FileEntry::esFold(){
 }
 
 void FileEntry::setNombre(char * nombre){
-    this->nombre = nombre;
+    this->nombre = new char[TAMNOMBRE];
+    memcpy(this->nombre, nombre, TAMNOMBRE);
+    this->nombre[TAMNOMBRE-1] = '\0';
 }

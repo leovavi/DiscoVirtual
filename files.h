@@ -11,16 +11,16 @@
 class Files : public QGraphicsItem
 {
 public:
-    Files(FileEntry * fe, int posX, int posY, bool selected);
+    Files(char * nombre, bool esFold, int posX, int posY, bool selected);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void updateFile(bool);
 
     QImage * image;
     QRectF rect;
-    FileEntry * fe;
+    char * nombre;
     int posX, posY;
-    bool selected;
+    bool esFold, selected;
 };
 
 #endif // FILES_H

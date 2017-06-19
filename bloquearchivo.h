@@ -1,5 +1,6 @@
 #ifndef BLOQUEARCHIVO_H
 #define BLOQUEARCHIVO_H
+#define TAMNOMBRE 25
 #include <string.h>
 #include "archivo.h"
 
